@@ -84,6 +84,20 @@ object CorpseFinder {
                 CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
             }
         }
+
+        MineshaftWaypointManager.waypoints.removeIf { waypoint ->
+            if (waypoint.type != MineshaftWaypoint.Type.POTENTIAL_CORPSE) return@removeIf false
+            if (areAllCorpsesFound()) return@removeIf true
+
+            if (!waypoint.location.canBeSeen(-1..3)) {
+                potentialWaypoints[waypoint] = 0
+                return@removeIf false
+            }
+
+            if (potentialWaypoints.addOrPut(waypoint, 1) < MARK_AS_FOUND_TICKS_THRESHOLD) return@removeIf false
+
+            corpseEntities.none { it.key.getLorenzVec().distance(waypoint.location) <= 3 }
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
@@ -102,20 +116,6 @@ object CorpseFinder {
 
         corpseEntities[entity] = MARK_AS_FOUND_TICKS_THRESHOLD
         CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
-
-        MineshaftWaypointManager.waypoints.removeIf { waypoint ->
-            if (waypoint.type != MineshaftWaypoint.Type.POTENTIAL_CORPSE) return@removeIf false
-            if (areAllCorpsesFound()) return@removeIf true
-
-            if (!waypoint.location.canBeSeen(-1..3)) {
-                potentialWaypoints[waypoint] = 0
-                return@removeIf false
-            }
-
-            if (potentialWaypoints.addOrPut(waypoint, 1) < MARK_AS_FOUND_TICKS_THRESHOLD) return@removeIf false
-
-            corpseEntities.none { it.key.getLorenzVec().distance(waypoint.location) <= 3 }
-        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
