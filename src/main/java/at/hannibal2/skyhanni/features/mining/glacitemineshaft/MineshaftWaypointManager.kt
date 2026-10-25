@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -41,8 +42,7 @@ object MineshaftWaypointManager {
     private const val LADDER_BLOCKS_DOWN = -15
 
     val waypoints = mutableListOf<MineshaftWaypoint>()
-    var potentialCorpseLocations = mapOf<MineshaftDetection.MineshaftType, List<LorenzVec>>()
-        private set
+    private var potentialCorpseLocations = mapOf<MineshaftDetection.MineshaftType, List<LorenzVec>>()
 
     private var timeLastShared = SimpleTimeMark.farPast()
     private var isWorldLoaded = false
@@ -155,6 +155,13 @@ object MineshaftWaypointManager {
 
         waypoints.add(MineshaftWaypoint(type = MineshaftWaypoint.Type.ENTRANCE, location = entranceLocation))
         waypoints.add(MineshaftWaypoint(type = MineshaftWaypoint.Type.LADDER, location = ladderLocation))
+    }
+
+    @HandleEvent
+    private fun onGlaciteMineshaftDetect(event: GlaciteMineshaftDetectEvent) {
+        potentialCorpseLocations.getOrElse(event.type) { listOf() }.forEach {
+            waypoints.add(MineshaftWaypoint(POTENTIAL_CORPSE, it))
+        }
     }
 
     @HandleEvent

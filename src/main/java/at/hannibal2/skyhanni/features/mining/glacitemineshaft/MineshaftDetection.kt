@@ -127,12 +127,6 @@ object MineshaftDetection {
             if (otherTypes == type) continue
             setSinceMineshaftType(otherTypes, getSinceMineshaftType(otherTypes) + 1)
         }
-
-        if (SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig.types.potentialCorpse) {
-            MineshaftWaypointManager.potentialCorpseLocations.getOrElse(type) { listOf() }.forEach {
-                MineshaftWaypointManager.waypoints.add(MineshaftWaypoint(POTENTIAL_CORPSE, it))
-            }
-        }
     }
 
     enum class MineshaftType(val color: LorenzColor, val rawName: String) {
