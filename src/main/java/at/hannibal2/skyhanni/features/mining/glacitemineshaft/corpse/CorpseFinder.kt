@@ -43,7 +43,7 @@ object CorpseFinder {
         "\\s*(?<corpse>\\w+): (?:NOT )?LOOTED\\s*",
     )
 
-    // Map with the corpse entity as the key and the consecutive ticks count of passing canBeSeen checks as value
+    // The following Maps' Int value represent the consecutive number of passing `canBeSeen` checks performed every player movement tick.
     private val corpseEntities = mutableMapOf<ArmorStand, Int>()
     private val potentialWaypoints = mutableMapOf<MineshaftWaypoint, Int>()
     private var totalCorpseCount = 0
